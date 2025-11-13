@@ -1,3 +1,3 @@
 export default function EventDetailPage(){
-    return <h1>Event Page</h1>;
+    return <h1>Event Detail Page</h1>;
 }
