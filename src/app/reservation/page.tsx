@@ -1,3 +1,12 @@
+"use client";
+
+import ReservationPageComponent from "@/components/reservation/ReservationPageComponent";
+import { useSearchParams } from "next/navigation";
+
 export default function ReservationPage(){
-    return <h1>Reservation Page</h1>;
+    const searchParams = useSearchParams();
+    const eventId = searchParams.get("eventId");
+    return (
+        <ReservationPageComponent eventId={eventId} />
+    );
 }
