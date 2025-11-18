@@ -19,8 +19,15 @@ export default function EventPageComponent(){
     return(
         <Box>
             <Banner />
-            <Box sx={{display:"flex", justifyContent:"center",alignContent:"center", gap:4, padding:2, flexWrap:"wrap"}}>
-                {events.map((event:EventModel) => (
+            <Box sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignContent: "center",
+                gap: { xs: 2, sm: 4 },
+                padding: { xs: 1, sm: 2 },
+                flexWrap: "wrap"
+            }}>
+                {events.map((event: EventModel) => (
                     <Box key={event._id}>
                         <Card event={event} />
                     </Box>

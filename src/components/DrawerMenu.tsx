@@ -26,7 +26,6 @@ export default function DrawerMenu({ open, toggleDrawer }: DrawerMenuProps) {
 
         if (user?.role === "admin") {
             menuItems.push(
-                { label: "Account Management", path: "/account-management", visible: true },
                 { label: "Event Management", path: "/event-management", visible: true },
                 { label: "Reservation Management", path: "/reservation-management", visible: true }
             );

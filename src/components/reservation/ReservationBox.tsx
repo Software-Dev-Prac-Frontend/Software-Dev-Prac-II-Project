@@ -59,8 +59,18 @@ export default function ReservationBox({ eventId, onChange }: ReservationBoxProp
     }
 
     return (
-        <Box sx={{ display: "flex", flexDirection: "column", width: 320, height: "fit-content", bgcolor: "white", p: 2, borderRadius: 2, boxShadow: 3, alignItems: "center", gap: 2, justifyContent: "center" }}>
-            <Typography variant="h6" fontWeight="bold" sx={{ alignItems: "center", color: "#000" }}>
+        <Box sx={{
+            display: "flex",
+            flexDirection: "column",
+            width: { xs: "100%", md: 320 },
+            height: "fit-content",
+            bgcolor: "white",
+            p: { xs: 2, sm: 3 },
+            borderRadius: 2,
+            boxShadow: 3,
+            gap: 2
+        }}>
+            <Typography variant="h6" fontWeight="bold" sx={{ color: "#000" }}>
                 Reservation
             </Typography>
             <Select
@@ -79,7 +89,7 @@ export default function ReservationBox({ eventId, onChange }: ReservationBoxProp
                 ))}
             </Select>
 
-            <TextField label="Number of Tickets" variant="outlined" type="number" inputProps={{ min: 1, max: 5 }} fullWidth sx={{ mb: 2 }} value={ticket} onChange={(e) => setTicket(Number(e.target.value))} />
+            <TextField label="Number of Tickets" variant="outlined" type="number" inputProps={{ min: 1, max: 5 }} fullWidth value={ticket} onChange={(e) => setTicket(Number(e.target.value))} />
             <Button variant="contained" color="primary" fullWidth onClick={handleCreateEvent}>
                 Reserve Now
             </Button>

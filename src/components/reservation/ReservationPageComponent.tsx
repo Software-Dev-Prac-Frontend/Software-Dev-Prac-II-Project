@@ -42,8 +42,9 @@ export default function ReservationPageComponent({ eventId, onChange }: Reservat
                 alignItems: "center",
                 minHeight: "100vh",
                 width: "100%",
-                flexDirection: "row",
-                gap: 4
+                flexDirection: { xs: "column", md: "row" },
+                gap: { xs: 2, md: 4 },
+                p: { xs: 2, md: 0 }
             }}>
                 <ReservationBox eventId={eventId} onChange={onChange} />
             </Box>
@@ -57,13 +58,44 @@ export default function ReservationPageComponent({ eventId, onChange }: Reservat
             alignItems: "center",
             minHeight: "100vh",
             width: "100%",
-            flexDirection: "row",
-            gap: 4,
-            py: 4
+            py: { xs: 2, md: 4 },
+            px: { xs: 1, md: 2 }
         }}>
-            <DetailEvent eventId={eventId} />
-            <Divider orientation="vertical" flexItem sx={{ borderColor: "#000", borderWidth: 2, borderRadius: 10 }} />
-            <ReservationBox eventId={eventId} onChange={onChange} />
+            <Box sx={{
+                display: "flex",
+                flexDirection: { xs: "column", md: "row" },
+                gap: { xs: 2, md: 4 },
+                alignItems: { xs: "stretch", md: "stretch" },
+                width: "100%"
+            }}>
+                <DetailEvent eventId={eventId} />
+                <Box
+                    sx={{
+                        display: { xs: "none", md: "block" }
+                    }}
+                >
+                    <Divider
+                        orientation="vertical"
+                        sx={{
+                            borderColor: "#000",
+                            borderWidth: 0.5
+                        }}
+                    />
+                </Box>
+                <Box
+                    sx={{
+                        display: { xs: "block", md: "none" }
+                    }}
+                >
+                    <Divider
+                        sx={{
+                            borderColor: "#000",
+                            borderWidth: 0.5
+                        }}
+                    />
+                </Box>
+                <ReservationBox eventId={eventId} onChange={onChange} />
+            </Box>
         </Box>
     );
 }
