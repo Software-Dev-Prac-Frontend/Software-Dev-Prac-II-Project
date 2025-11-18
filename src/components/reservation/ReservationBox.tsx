@@ -1,101 +1,56 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Box, Button, Select, MenuItem, TextField, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+import { Box, Button, Select, MenuItem, TextField, Typography, Alert } from "@mui/material";
 import { EventModel } from "@/models/Event.model";
-
-//TODO: Replace with real API call to fetch events
-const MOCK_EVENTS: { success: boolean; count: number; data: EventModel[] } = {
-    success: true,
-    count: 6,
-    data: [
-        {
-            _id: "1",
-            name: "Bloom Festival",
-            description: "A vibrant celebration of spring blooms",
-            eventDate: "2024-08-15T18:00:00Z",
-            venue: "Central Park",
-            organizer: "City Events",
-            availableTicket: 150,
-            posterPicture: "/img/bloom.jpg",
-            createdAt: "2024-07-01T10:00:00Z",
-            updatedAt: "2024-07-15T14:00:00Z",
-        },
-        {
-            _id: "2",
-            name: "Summer Concert",
-            description: "Live music performances",
-            eventDate: "2024-08-20T19:00:00Z",
-            venue: "Riverside Theater",
-            organizer: "Music Productions",
-            availableTicket: 200,
-            posterPicture: "/img/bloom.jpg",
-            createdAt: "2024-07-02T10:00:00Z",
-            updatedAt: "2024-07-16T14:00:00Z",
-        },
-        {
-            _id: "3",
-            name: "Art Exhibition",
-            description: "Contemporary art showcase",
-            eventDate: "2024-08-25T10:00:00Z",
-            venue: "Modern Art Gallery",
-            organizer: "Art Society",
-            availableTicket: 100,
-            posterPicture: "/img/bloom.jpg",
-            createdAt: "2024-07-03T10:00:00Z",
-            updatedAt: "2024-07-17T14:00:00Z",
-        },
-        {
-            _id: "4",
-            name: "Food Festival",
-            description: "Culinary delights from around the world",
-            eventDate: "2024-09-01T12:00:00Z",
-            venue: "Downtown Square",
-            organizer: "Culinary Club",
-            availableTicket: 300,
-            posterPicture: "/img/bloom.jpg",
-            createdAt: "2024-07-04T10:00:00Z",
-            updatedAt: "2024-07-18T14:00:00Z",
-        },
-        {
-            _id: "5",
-            name: "Tech Conference",
-            description: "Latest innovations in technology",
-            eventDate: "2024-09-10T09:00:00Z",
-            venue: "Convention Center",
-            organizer: "Tech Innovations",
-            availableTicket: 250,
-            posterPicture: "/img/bloom.jpg",
-            createdAt: "2024-07-05T10:00:00Z",
-            updatedAt: "2024-07-19T14:00:00Z",
-        },
-        {
-            _id: "6",
-            name: "Jazz Night",
-            description: "An evening of smooth jazz",
-            eventDate: "2024-09-15T20:00:00Z",
-            venue: "Blue Note Club",
-            organizer: "Jazz Organization",
-            availableTicket: 80,
-            posterPicture: "/img/bloom.jpg",
-            createdAt: "2024-07-06T10:00:00Z",
-            updatedAt: "2024-07-20T14:00:00Z",
-        },
-    ]
-}
+import getEvents from "@/libs/getEvents";
+import { createTicketing } from "@/libs/createTicketing";
+import { useRouter } from "next/navigation";
+import CheckIcon from '@mui/icons-material/Check';
 
 interface ReservationBoxProps {
-    eventId: string | null;
-    onChange: (id: string | null) => void;
+    eventId: string;
+    onChange: (id: string) => void;
 }
 
 export default function ReservationBox({ eventId, onChange }: ReservationBoxProps) {
-    const events = MOCK_EVENTS.data;
-    const [selectedEventId, setSelectedEventId] = useState<string | "">("");
+    const [events, setEvents] = useState<EventModel[]>([]);
+    const [ticket, setTicket] = useState<number>(1);
+    const [token, setToken] = useState<string>("");
+    const router = useRouter();
+    
+    useEffect(() => {
+        const t = localStorage.getItem("token");
+        if (t) setToken(t);
+    }, []);
+
+    async function handleCreateEvent() {
+        if(!token){
+            window.alert("Please login to reserve ticket.");
+        }
+        else{
+            try{
+                console.log("Creating ticketing for eventId:", eventId, "with", ticket, "tickets.");
+            await createTicketing(eventId, ticket, token);
+            router.push("/myreservation");
+            } catch (err: any) {
+                window.alert(err.message || "Reservation failed");
+            }
+        }
+    }
+    useEffect(() => {
+        async function fetchEvent() {
+            const res = await getEvents();
+            setEvents(res.data);
+        }
+        fetchEvent();
+    }, []);
+    
+    const [selectedEventId, setSelectedEventId] = useState<string>("");
 
     useEffect(() => {
         setSelectedEventId(eventId ?? "");
-        onChange(eventId ?? null);
+        onChange(eventId ?? "");
     }, [eventId]);
 
     const handleEventChange = (id: string) => {
@@ -124,8 +79,8 @@ export default function ReservationBox({ eventId, onChange }: ReservationBoxProp
                 ))}
             </Select>
 
-            <TextField label="Number of Tickets" variant="outlined" type="number" inputProps={{ min: 1, max: 5, defaultValue: 1 }} fullWidth sx={{ mb: 2 }} />
-            <Button variant="contained" color="primary" fullWidth>
+            <TextField label="Number of Tickets" variant="outlined" type="number" inputProps={{ min: 1, max: 5 }} fullWidth sx={{ mb: 2 }} value={ticket} onChange={(e) => setTicket(Number(e.target.value))} />
+            <Button variant="contained" color="primary" fullWidth onClick={handleCreateEvent}>
                 Reserve Now
             </Button>
         </Box>
