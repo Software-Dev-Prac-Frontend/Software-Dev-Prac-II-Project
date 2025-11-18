@@ -1,3 +1,18 @@
+"use client";
+
+import ReservationPageComponent from "@/components/reservation/ReservationPageComponent";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+
 export default function ReservationPage(){
-    return <h1>Reservation Page</h1>;
+    const searchParams = useSearchParams();
+    const eventId = searchParams.get("eventId");
+    const [eventIdState, setEventIdState] = useState<string | null>(null);
+
+    useEffect(() => {
+        setEventIdState(eventId);
+    }, [eventId]);
+    return (
+        <ReservationPageComponent eventId={eventIdState} onChange={setEventIdState} />
+    );
 }
