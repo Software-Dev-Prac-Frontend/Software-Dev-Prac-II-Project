@@ -6,6 +6,7 @@ import { Box, Button, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
 import { EventModel } from "@/models/Event.model";
+import { convertGoogleDriveUrl } from "@/libs/imageUtils";
 
 interface CardProps {
     event: EventModel;
@@ -23,7 +24,7 @@ export default function Card({
         <InteractiveCard>
             <Box sx={{display: "flex", flexDirection: "column", width: 320, minHeight: 500, gap: 2, p: 4, bgcolor: "white", border: 2, borderColor: "#6d9468", borderRadius: 2}}>
                 <Image
-                    src={event.posterPicture || "/img/Bloom.jpg"}
+                    src={convertGoogleDriveUrl(event.posterPicture) || "/img/Bloom.jpg"}
                     style={{width:"100%", height:"auto", borderRadius: "4px", objectFit: "cover"}}  
                     alt="Party Image"
                     width={200}

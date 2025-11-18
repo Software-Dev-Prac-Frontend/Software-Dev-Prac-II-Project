@@ -61,8 +61,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (response.ok) {
         const data = await response.json();
-        setUser({ ...data, _id: data._id, tel: '' });
         localStorage.setItem("token", data.token);
+        
+        // Fetch user data to get role
+        const userResponse = await fetch('http://localhost:5000/api/v1/auth/me', {
+          headers: {
+            "Authorization": `Bearer ${data.token}`,
+          },
+        });
+
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          setUser(userData.data);
+        } else {
+          // Fallback: set user with available data
+          setUser({ ...data, _id: data._id, tel: '', role: 'member' });
+        }
         return true;
       }
       return false;
@@ -85,7 +99,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (response.ok) {
         const data = await response.json();
-        setUser({ ...data, _id: data._id, tel, role, password: '' });
+        localStorage.setItem("token", data.token);
+        
+        // Fetch user data to get complete user info with role
+        const userResponse = await fetch('http://localhost:5000/api/v1/auth/me', {
+          headers: {
+            "Authorization": `Bearer ${data.token}`,
+          },
+        });
+
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          setUser(userData.data);
+        } else {
+          // Fallback: set user with available data
+          setUser({ ...data, _id: data._id, tel, role, password: '' });
+        }
         return true;
       }
       return false;

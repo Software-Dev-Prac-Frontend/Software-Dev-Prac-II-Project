@@ -6,6 +6,7 @@ import Image from "next/image";
 import getEvent from "@/libs/getEvent";
 import { useEffect, useState } from "react";
 import { EventModel, MODEL_DEFAULT } from "@/models/Event.model";
+import { convertGoogleDriveUrl } from "@/libs/imageUtils";
 
 export default function DetailEvent({ eventId }: { eventId: string }) {
     const [event,setEvent] = useState<EventModel>(MODEL_DEFAULT)
@@ -22,7 +23,7 @@ export default function DetailEvent({ eventId }: { eventId: string }) {
     return (
         <Box sx={{display: "flex", flexDirection: "column", width: 320, height: "auto", gap: 2, bgcolor: "white"}}>
             <Image
-                src={event.posterPicture || "/img/Bloom.jpg"}
+                src={convertGoogleDriveUrl(event.posterPicture) || "/img/Bloom.jpg"}
                 style={{width:"100%", height:"auto", borderRadius: "4px", objectFit: "cover"}}  
                 alt="Party Image"
                 width={200}
