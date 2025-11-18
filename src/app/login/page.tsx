@@ -29,16 +29,79 @@ export default function LoginPage() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
   const { login, register } = useAuth();
   const router = useRouter();
 
+  const validateField = (name: string, value: string) => {
+    const errors: {[key: string]: string} = {};
+    
+    switch (name) {
+      case 'name':
+        if (!value.trim()) errors.name = 'Name is required';
+        break;
+      case 'email':
+        if (!value.trim()) {
+          errors.email = 'Email is required';
+        } else if (!/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(value)) {
+          errors.email = 'Please add a valid email';
+        }
+        break;
+      case 'tel':
+        if (!value.trim()) errors.tel = 'Phone number is required';
+        break;
+      case 'password':
+        if (!value) {
+          errors.password = 'Password is required';
+        } else if (value.length < 6) {
+          errors.password = 'Password must be at least 6 characters';
+        }
+        break;
+    }
+    
+    return errors;
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    
+    // Clear validation error for this field when user starts typing
+    if (validationErrors[name]) {
+      setValidationErrors({ ...validationErrors, [name]: '' });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setValidationErrors({});
+    
+    // Validate all fields for registration
+    if (!isLogin) {
+      const allErrors: {[key: string]: string} = {};
+      
+      Object.assign(allErrors, validateField('name', formData.name));
+      Object.assign(allErrors, validateField('email', formData.email));
+      Object.assign(allErrors, validateField('tel', formData.tel));
+      Object.assign(allErrors, validateField('password', formData.password));
+      
+      if (Object.keys(allErrors).length > 0) {
+        setValidationErrors(allErrors);
+        return;
+      }
+    } else {
+      // Validate email and password for login
+      const allErrors: {[key: string]: string} = {};
+      Object.assign(allErrors, validateField('email', formData.email));
+      Object.assign(allErrors, validateField('password', formData.password));
+      
+      if (Object.keys(allErrors).length > 0) {
+        setValidationErrors(allErrors);
+        return;
+      }
+    }
+
     setLoading(true);
 
     try {
@@ -85,6 +148,8 @@ export default function LoginPage() {
                 onChange={handleInputChange}
                 margin="normal"
                 required
+                error={!!validationErrors.name}
+                helperText={validationErrors.name}
               />
             )}
             
@@ -97,6 +162,8 @@ export default function LoginPage() {
               onChange={handleInputChange}
               margin="normal"
               required
+              error={!!validationErrors.email}
+              helperText={validationErrors.email}
             />
             
             {!isLogin && (
@@ -108,6 +175,8 @@ export default function LoginPage() {
                 onChange={handleInputChange}
                 margin="normal"
                 required
+                error={!!validationErrors.tel}
+                helperText={validationErrors.tel}
               />
             )}
             
@@ -135,6 +204,8 @@ export default function LoginPage() {
               onChange={handleInputChange}
               margin="normal"
               required
+              error={!!validationErrors.password}
+              helperText={validationErrors.password}
             />
             
             <Button
