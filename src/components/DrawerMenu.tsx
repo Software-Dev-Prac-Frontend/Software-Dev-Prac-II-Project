@@ -2,7 +2,7 @@
 
 import { Drawer, Box, List, ListItem, ListItemText } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useAuth } from '@/contexts/AuthContext';
 
 interface DrawerMenuProps {
   open: boolean;
@@ -11,7 +11,12 @@ interface DrawerMenuProps {
 
 export default function DrawerMenu({ open, toggleDrawer }: DrawerMenuProps) {
     const router = useRouter();
-    const [login, setLogin] =  useState<boolean>(false);
+    const { user, logout } = useAuth();
+
+    const handleSignOut = () => {
+        logout();
+        toggleDrawer();
+    };
     return(
     <Drawer anchor="left" open={open} onClose={toggleDrawer}>
         <Box sx={{ width: 250, height: "100%", display: "flex", flexDirection: "column", marginTop: 4}} role="presentation" onClick={toggleDrawer} onKeyDown={toggleDrawer}>
@@ -33,15 +38,15 @@ export default function DrawerMenu({ open, toggleDrawer }: DrawerMenuProps) {
                 </ListItem>
             </List>
             <List sx={{ marginTop: "auto" }}>
-                {(!login ?
+                {!user ?
                     <ListItem component="button" onClick={() => router.push("/login")} sx={{cursor:"pointer"}}>
                         <ListItemText primary="Sign In" />
                     </ListItem>
                     :
-                    <ListItem component="button" sx={{cursor:"pointer"}}>
+                    <ListItem component="button" onClick={handleSignOut} sx={{cursor:"pointer"}}>
                         <ListItemText primary="Sign Out" />
                     </ListItem>
-                )}
+                }
             </List>
         </Box>
     </Drawer>);
