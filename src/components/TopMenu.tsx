@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { 
-    Box, AppBar, Toolbar, IconButton, Typography, Drawer, List, ListItem, ListItemText 
+    Box, AppBar, Toolbar, IconButton,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import DrawerMenu from "./DrawerMenu";
