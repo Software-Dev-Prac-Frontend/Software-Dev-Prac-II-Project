@@ -21,7 +21,7 @@ export default function Card({
     }
     return (
         <InteractiveCard>
-            <Box sx={{display: "flex", flexDirection: "column", width: 320, height: "auto", gap: 2, p: 2, bgcolor: "white", border: 2, borderColor: "#6d9468", borderRadius: 2}}>
+            <Box sx={{display: "flex", flexDirection: "column", width: 320, minHeight: 500, gap: 2, p: 4, bgcolor: "white", border: 2, borderColor: "#6d9468", borderRadius: 2}}>
                 <Image
                     src={event.posterPicture || "/img/Bloom.jpg"}
                     style={{width:"100%", height:"auto", borderRadius: "4px", objectFit: "cover"}}  
@@ -31,7 +31,7 @@ export default function Card({
                 />
                 <Box sx={{color:"#000", gap: "8px"}}>
                     <Typography variant="h6" fontWeight="bold">{event.name}</Typography>
-                    <Typography>{event.description}</Typography>
+                    <Typography>Description: {event.description}</Typography>
                     <Typography>Venue: {event.venue}</Typography>
                     <Typography>Date: {dayjs(event.eventDate).format("DD/MM/YYYY")}</Typography>
                     <Typography>Organizer: {event.organizer}</Typography>

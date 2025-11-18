@@ -3,22 +3,22 @@
 import { Box, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import Image from "next/image";
+import getEvent from "@/libs/getEvent";
+import { useEffect, useState } from "react";
+import { EventModel, MODEL_DEFAULT } from "@/models/Event.model";
 
-// TODO: API CALL TO GET EVENT DETAIL BY ID
-const event = {
-    _id: "6",
-    name: "Jazz Night",
-    description: "An evening of smooth jazz",
-    eventDate: "2024-09-15T20:00:00Z",
-    venue: "Blue Note Club",
-    organizer: "Jazz Organization",
-    availableTicket: 80,
-    posterPicture: "/img/bloom.jpg",
-    createdAt: "2024-07-06T10:00:00Z",
-    updatedAt: "2024-07-20T14:00:00Z",
-};
-
-export default function DetailEvent({ eventId }: { eventId: string | null }) {
+export default function DetailEvent({ eventId }: { eventId: string }) {
+    const [event,setEvent] = useState<EventModel>(MODEL_DEFAULT)
+    if (!eventId) {
+        return <></>;
+    }
+    useEffect(() => {
+        async function fetchEvent() {
+            const res = await getEvent(eventId);
+            setEvent(res.data);
+        }
+        fetchEvent();
+    }, [eventId]);
     return (
         <Box sx={{display: "flex", flexDirection: "column", width: 320, height: "auto", gap: 2, bgcolor: "white"}}>
             <Image

@@ -23,19 +23,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/v1/auth/me', {
-        credentials: 'include',
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        setIsLoading(false);
+        return;
+      }
+
+      const response = await fetch("http://localhost:5000/api/v1/auth/me", {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
       });
+
       if (response.ok) {
         const data = await response.json();
         setUser(data.data);
       }
-    } catch (error) {
-      console.error('Auth check failed:', error);
+    } catch (err) {
+      console.error(err);
     } finally {
       setIsLoading(false);
     }
   };
+
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
@@ -51,6 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (response.ok) {
         const data = await response.json();
         setUser({ ...data, _id: data._id, tel: '' });
+        localStorage.setItem("token", data.token);
         return true;
       }
       return false;
@@ -92,6 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error('Logout failed:', error);
     } finally {
       setUser(null);
+      localStorage.clear();
     }
   };
 

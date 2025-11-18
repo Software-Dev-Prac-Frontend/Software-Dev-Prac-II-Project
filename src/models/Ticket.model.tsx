@@ -1,13 +1,21 @@
-import { EventModel } from "./Event.model";
-import { User } from "./User.model";
-
-export interface Ticket{
+export interface Ticket {
     _id: string;
-    User: User;
-    Event: EventModel;
+    user: string;
+    event: {
+        _id: string;
+        name: string;
+        description: string;
+        eventDate: string;
+        venue: string;
+        availableTicket: number;
+    };
+    ticketAmount: number;
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
 }
 
-export interface ResponseGetTickets{
+export interface ResponseGetTickets {
     success: boolean;
     count: number;
     data: Ticket[];
