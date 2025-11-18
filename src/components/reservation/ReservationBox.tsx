@@ -2,10 +2,10 @@
 
 import React, { useEffect, useState } from "react";
 import { Box, Button, Select, MenuItem, TextField, Typography } from "@mui/material";
-import { Event } from "@/models/Event.model";
+import { EventModel } from "@/models/Event.model";
 
 //TODO: Replace with real API call to fetch events
-const MOCK_EVENTS: { success: boolean; count: number; data: Event[] } = {
+const MOCK_EVENTS: { success: boolean; count: number; data: EventModel[] } = {
     success: true,
     count: 6,
     data: [

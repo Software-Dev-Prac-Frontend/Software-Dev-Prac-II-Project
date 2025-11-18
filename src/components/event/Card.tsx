@@ -5,10 +5,10 @@ import InteractiveCard from "./InteractiveCard";
 import { Box, Button, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
-import { Event } from "@/models/Event.model";
+import { EventModel } from "@/models/Event.model";
 
 interface CardProps {
-    event: Event;
+    event: EventModel;
 }
 
 export default function Card({

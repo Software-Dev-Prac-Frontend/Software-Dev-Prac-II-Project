@@ -3,9 +3,9 @@
 import { Box } from "@mui/material";
 import Card from "./Card";
 import Banner from "./Banner";
-import { Event } from "@/models/Event.model";
+import { EventModel } from "@/models/Event.model";
 
-const MOCK_EVENTS: { success: boolean; count: number; data: Event[] } = {
+const MOCK_EVENTS: { success: boolean; count: number; data: EventModel[] } = {
     success: true,
     count: 6,
     data: [

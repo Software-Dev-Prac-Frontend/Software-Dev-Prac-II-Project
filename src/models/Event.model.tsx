@@ -1,4 +1,4 @@
-export interface Event {
+export interface EventModel {
     _id: string;
     name: string;
     description: string;
@@ -9,4 +9,10 @@ export interface Event {
     posterPicture: string;
     createdAt: string;
     updatedAt: string;
+}
+
+export interface ResponseGetEvents {
+    success: boolean;
+    count: number;
+    data: EventModel[];
 }
