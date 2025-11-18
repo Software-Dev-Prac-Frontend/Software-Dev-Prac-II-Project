@@ -3,7 +3,7 @@
 import { Box } from "@mui/material";
 import Card from "./Card";
 import Banner from "./Banner";
-import { Event } from "./Card";
+import { Event } from "@/models/Event.model";
 
 const MOCK_EVENTS: { success: boolean; count: number; data: Event[] } = {
     success: true,

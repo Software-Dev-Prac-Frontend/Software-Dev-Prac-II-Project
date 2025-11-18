@@ -5,19 +5,7 @@ import InteractiveCard from "./InteractiveCard";
 import { Box, Button, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
-
-export interface Event {
-    _id: string;
-    name: string;
-    description: string;
-    eventDate: string;
-    venue: string;
-    organizer: string;
-    availableTicket: number;
-    posterPicture: string;
-    createdAt: string;
-    updatedAt: string;
-}
+import { Event } from "@/models/Event.model";
 
 interface CardProps {
     event: Event;
