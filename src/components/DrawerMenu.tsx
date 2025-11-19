@@ -47,7 +47,7 @@ export default function DrawerMenu({ open, toggleDrawer }: DrawerMenuProps) {
 
     return(
     <Drawer anchor="left" open={open} onClose={toggleDrawer}>
-        <Box sx={{ width: 250, height: "100%", display: "flex", flexDirection: "column", marginTop: 4}} role="presentation" onClick={toggleDrawer} onKeyDown={toggleDrawer}>
+        <Box sx={{ width: 250, height: "100%", display: "flex", flexDirection: "column", marginTop: 2}} role="presentation" onClick={toggleDrawer} onKeyDown={toggleDrawer}>
             <List>
                 {menuItems.map((item, index) => (
                     <ListItem key={index} component="button" onClick={() => router.push(item.path)} sx={{cursor:"pointer"}}>

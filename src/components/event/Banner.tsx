@@ -24,11 +24,11 @@ export default function Banner(){
                 }}
             >
                 <Typography sx={{ color: "white", fontSize: { xs: "1.875rem", sm: "2.25rem" }, fontWeight: 600 }}>
-                    where every event finds its venue
+                    Find your next experience.
                 </Typography>
 
                 <Typography sx={{ color: "#e5e7eb", mt: 2 }}>
-                    Find and book the perfect space for your next event.
+                    Browse upcoming events and book your spot in seconds.
                 </Typography>
             </Box>
         </Box>

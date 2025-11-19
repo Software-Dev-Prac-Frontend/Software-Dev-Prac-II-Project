@@ -1,14 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { 
     Box, AppBar, Toolbar, IconButton,
+    Typography,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import DrawerMenu from "./DrawerMenu";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function TopMenu() {
     const [open, setOpen] = useState(false);
+    const router = useRouter();
+    const { user } = useAuth();
 
     const toggleDrawer = () => {
         setOpen(!open);
@@ -32,8 +37,21 @@ export default function TopMenu() {
                     </Box>
 
                 <Box sx={{ flexGrow: 1 }} />
-
-                <Box>Logo</Box>
+                {
+                    (user) && (
+                        <Typography variant="body1" component="div" sx={{ cursor: "default" }}>
+                            Welcome, {user.name}
+                        </Typography>
+                    )
+                }
+                <img
+                    src="/img/logo.png"
+                    alt="Logo"
+                    width={60}
+                    height={60}
+                    style={{ objectFit: "contain",cursor:"pointer" }}
+                    onClick={()=>{router.push("/")}}
+                />
                 </Toolbar>
             </AppBar>
         </Box>
