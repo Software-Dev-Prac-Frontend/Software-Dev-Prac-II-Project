@@ -1,14 +1,17 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Box, Button, Container, Dialog, DialogContent, DialogTitle, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Alert, CircularProgress } from '@mui/material';
+import { Box, Button, Container, Dialog, DialogContent, DialogTitle, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Alert, CircularProgress, TextField, MenuItem, Collapse } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import ReservationForm from './ReservationForm';
 import { Ticket } from '@/models/Ticket.model';
 import { formatEventDate } from '@/libs/eventValidation';
+import { searchReservations, filterReservationsByEventDateRange, filterReservationsByRequestedDateRange, filterReservationsByTicketAmount } from '@/libs/searchFilterUtils';
 import { useAlert } from '@/contexts/AlertContext';
 import ConfirmDeleteDialog from '../ConfirmDeleteDialog';
 
@@ -20,12 +23,21 @@ export default function ReservationManagementPageComponent() {
   const router = useRouter();
   const { showAlert } = useAlert();
   const [reservations, setReservations] = useState<Ticket[]>([]);
+  const [filteredReservations, setFilteredReservations] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState<Ticket | null>(null);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [expandFilters, setExpandFilters] = useState(false);
+  const [eventDateStart, setEventDateStart] = useState<string>('');
+  const [eventDateEnd, setEventDateEnd] = useState<string>('');
+  const [requestedDateStart, setRequestedDateStart] = useState<string>('');
+  const [requestedDateEnd, setRequestedDateEnd] = useState<string>('');
+  const [minTicketAmount, setMinTicketAmount] = useState<number | null>(null);
+  const [maxTicketAmount, setMaxTicketAmount] = useState<number | null>(null);
 
   const handleAskDelete = (id: string) => {
     setDeleteId(id);
@@ -63,6 +75,15 @@ export default function ReservationManagementPageComponent() {
   useEffect(() => {
     loadReservations();
   }, []);
+
+  useEffect(() => {
+    let result = [...reservations];
+    result = searchReservations(result, searchTerm);
+    result = filterReservationsByEventDateRange(result, eventDateStart || null, eventDateEnd || null);
+    result = filterReservationsByRequestedDateRange(result, requestedDateStart || null, requestedDateEnd || null);
+    result = filterReservationsByTicketAmount(result, minTicketAmount, maxTicketAmount);
+    setFilteredReservations(result);
+  }, [reservations, searchTerm, eventDateStart, eventDateEnd, requestedDateStart, requestedDateEnd, minTicketAmount, maxTicketAmount]);
 
   const handleOpenDialog = (reservation?: Ticket) => {
     if (reservation) {
@@ -147,11 +168,123 @@ export default function ReservationManagementPageComponent() {
         </Alert>
       )}
 
+      <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap', alignItems: 'center' }}>
+        <TextField
+          label="Search reservations"
+          variant="outlined"
+          size="small"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Name, email, event, venue..."
+          sx={{ flex: 1, minWidth: 250 }}
+        />
+        <Button
+          variant="outlined"
+          size="small"
+          onClick={() => setExpandFilters(!expandFilters)}
+          sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+        >
+          Filter by Date & Ticket Amount
+          {expandFilters ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+        </Button>
+      </Box>
+
+      <Collapse in={expandFilters}>
+        <Paper sx={{ p: 3, mb: 3, backgroundColor: '#f9f9f9' }}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr 1fr' }, gap: 2, mb: 2 }}>
+            <Box>
+              <Box sx={{ fontSize: '0.85rem', fontWeight: 600, mb: 1, color: '#666' }}>Event Date From</Box>
+              <TextField
+                type="date"
+                label="Start Date"
+                size="small"
+                value={eventDateStart}
+                onChange={(e) => setEventDateStart(e.target.value)}
+                InputLabelProps={{ shrink: true }}
+                sx={{ width: '100%' }}
+              />
+            </Box>
+            <Box>
+              <Box sx={{ fontSize: '0.85rem', fontWeight: 600, mb: 1, color: '#666' }}>Event Date To</Box>
+              <TextField
+                type="date"
+                label="End Date"
+                size="small"
+                value={eventDateEnd}
+                onChange={(e) => setEventDateEnd(e.target.value)}
+                InputLabelProps={{ shrink: true }}
+                sx={{ width: '100%' }}
+              />
+            </Box>
+            <Box>
+              <Box sx={{ fontSize: '0.85rem', fontWeight: 600, mb: 1, color: '#666' }}>Requested Date From</Box>
+              <TextField
+                type="date"
+                label="Start Date"
+                size="small"
+                value={requestedDateStart}
+                onChange={(e) => setRequestedDateStart(e.target.value)}
+                InputLabelProps={{ shrink: true }}
+                sx={{ width: '100%' }}
+              />
+            </Box>
+            <Box>
+              <Box sx={{ fontSize: '0.85rem', fontWeight: 600, mb: 1, color: '#666' }}>Requested Date To</Box>
+              <TextField
+                type="date"
+                label="End Date"
+                size="small"
+                value={requestedDateEnd}
+                onChange={(e) => setRequestedDateEnd(e.target.value)}
+                InputLabelProps={{ shrink: true }}
+                sx={{ width: '100%' }}
+              />
+            </Box>
+          </Box>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+            <TextField
+              type="number"
+              label="Min Ticket Amount"
+              size="small"
+              value={minTicketAmount === null ? '' : minTicketAmount}
+              onChange={(e) => setMinTicketAmount(e.target.value === '' ? null : parseInt(e.target.value, 10))}
+              inputProps={{ min: 0 }}
+              sx={{ width: '100%' }}
+            />
+            <TextField
+              type="number"
+              label="Max Ticket Amount"
+              size="small"
+              value={maxTicketAmount === null ? '' : maxTicketAmount}
+              onChange={(e) => setMaxTicketAmount(e.target.value === '' ? null : parseInt(e.target.value, 10))}
+              inputProps={{ min: 0 }}
+              sx={{ width: '100%' }}
+            />
+          </Box>
+          <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => {
+                setEventDateStart('');
+                setEventDateEnd('');
+                setRequestedDateStart('');
+                setRequestedDateEnd('');
+                setMinTicketAmount(null);
+                setMaxTicketAmount(null);
+              }}
+            >
+              Clear All Filters
+            </Button>
+          </Box>
+        </Paper>
+      </Collapse>
+
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
           <CircularProgress />
         </Box>
-      ) : reservations.length === 0 ? (
+      ) : filteredReservations.length === 0 ? (
         <Alert severity="info">No reservations found.</Alert>
       ) : (
         <TableContainer component={Paper}>
@@ -168,7 +301,7 @@ export default function ReservationManagementPageComponent() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {reservations.map((reservation) => (
+              {filteredReservations.map((reservation) => (
                 <TableRow key={reservation._id}>
                   <TableCell>
                     {typeof reservation.user === 'string'

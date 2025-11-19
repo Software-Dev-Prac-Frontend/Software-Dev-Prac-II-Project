@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Box, Container, Alert, CircularProgress } from '@mui/material';
+import { Box, Container, Alert, CircularProgress, TextField, MenuItem, Button } from '@mui/material';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { EventModel } from '@/models/Event.model';
 import { fetchAllEvents, createEvent, updateEvent, deleteEvent } from '@/libs/eventApi';
+import { searchEventsByNameVenueOrganizer, filterEventsByDateRange, filterEventsByTicketAvailability } from '@/libs/searchFilterUtils';
 import { useAlert } from '@/contexts/AlertContext';
 import ConfirmDeleteDialog from '../ConfirmDeleteDialog';
 import EventFormDialog from './EventFormDialog';
@@ -31,6 +32,7 @@ export default function EventManagementPageComponent() {
   const { user } = useAuth();
   const router = useRouter();
   const [events, setEvents] = useState<EventModel[]>([]);
+  const [filteredEvents, setFilteredEvents] = useState<EventModel[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
@@ -39,6 +41,10 @@ export default function EventManagementPageComponent() {
   const { showAlert } = useAlert();
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
+  const [availabilityFilter, setAvailabilityFilter] = useState<'all' | 'available' | 'soldout'>('all');
 
 
   const askDeleteEvent = (id: string) => {
@@ -70,6 +76,14 @@ export default function EventManagementPageComponent() {
   useEffect(() => {
     loadEvents();
   }, []);
+
+  useEffect(() => {
+    let result = [...events];
+    result = searchEventsByNameVenueOrganizer(result, searchTerm);
+    result = filterEventsByDateRange(result, startDate || null, endDate || null);
+    result = filterEventsByTicketAvailability(result, availabilityFilter);
+    setFilteredEvents(result);
+  }, [events, searchTerm, startDate, endDate, availabilityFilter]);
 
   const handleOpenDialog = (eventData?: EventModel) => {
     if (eventData) {
@@ -139,12 +153,67 @@ export default function EventManagementPageComponent() {
         </Alert>
       )}
 
+      <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+        <TextField
+          label="Search by name, venue, or organizer"
+          variant="outlined"
+          size="small"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search..."
+          sx={{ flex: 1, minWidth: 250 }}
+        />
+        <TextField
+          label="Start Date"
+          type="date"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+          size="small"
+          InputLabelProps={{ shrink: true }}
+          sx={{ minWidth: 150 }}
+        />
+        <TextField
+          label="End Date"
+          type="date"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+          size="small"
+          InputLabelProps={{ shrink: true }}
+          sx={{ minWidth: 150 }}
+        />
+        <TextField
+          select
+          label="Availability"
+          value={availabilityFilter}
+          onChange={(e) => setAvailabilityFilter(e.target.value as 'all' | 'available' | 'soldout')}
+          size="small"
+          sx={{ minWidth: 150 }}
+        >
+          <MenuItem value="all">All</MenuItem>
+          <MenuItem value="available">Available</MenuItem>
+          <MenuItem value="soldout">Sold Out</MenuItem>
+        </TextField>
+        {(searchTerm || startDate || endDate) && (
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={() => {
+              setSearchTerm('');
+              setStartDate('');
+              setEndDate('');
+            }}
+          >
+            Clear Filters
+          </Button>
+        )}
+      </Box>
+
       {loading ? (
         <LoadingState />
-      ) : events.length === 0 ? (
+      ) : filteredEvents.length === 0 ? (
         <EmptyState />
       ) : (
-        <EventsTable events={events} onEdit={handleOpenDialog} onDelete={askDeleteEvent} />
+        <EventsTable events={filteredEvents} onEdit={handleOpenDialog} onDelete={askDeleteEvent} />
       )}
 
       <EventFormDialog
