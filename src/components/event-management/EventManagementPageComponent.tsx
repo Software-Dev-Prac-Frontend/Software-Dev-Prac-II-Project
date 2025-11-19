@@ -1,19 +1,31 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Box, Button, Container, Dialog, DialogContent, DialogTitle, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Alert, CircularProgress } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
+import { Box, Container, Alert, CircularProgress } from '@mui/material';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
-import EventForm from './EventForm';
 import { EventModel } from '@/models/Event.model';
 import { fetchAllEvents, createEvent, updateEvent, deleteEvent } from '@/libs/eventApi';
-import { formatEventDate } from '@/libs/eventValidation';
-import { TABLE_HEADERS } from '@/libs/eventConstants';
 import { useAlert } from '@/contexts/AlertContext';
 import ConfirmDeleteDialog from '../ConfirmDeleteDialog';
+import EventFormDialog from './EventFormDialog';
+import EventsTable from './EventsTable';
+import EventManagementHeader from './EventManagementHeader';
+
+const DELETE_CONFIRMATION_MESSAGE = 'Are you sure you want to delete this event?';
+
+// Sub-components
+function LoadingState() {
+  return (
+    <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+      <CircularProgress />
+    </Box>
+  );
+}
+
+function EmptyState() {
+  return <Alert severity="info">No events found. Create your first event!</Alert>;
+}
 
 export default function EventManagementPageComponent() {
   const { user } = useAuth();
@@ -146,156 +158,8 @@ export default function EventManagementPageComponent() {
         open={confirmDeleteOpen}
         onClose={() => setConfirmDeleteOpen(false)}
         onConfirm={confirmDeleteEvent}
-        message="Are you sure you want to delete this event?"
+        message={DELETE_CONFIRMATION_MESSAGE}
       />
     </Container>
-  );
-}
-
-// Sub-components
-interface EventManagementHeaderProps {
-  onCreateClick: () => void;
-}
-
-function EventManagementHeader({ onCreateClick }: EventManagementHeaderProps) {
-  return (
-    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-      <h1 style={{ color: 'black' }}>Event Management</h1>
-      <Button
-        variant="contained"
-        startIcon={<AddIcon />}
-        onClick={onCreateClick}
-      >
-        Create Event
-      </Button>
-    </Box>
-  );
-}
-
-function LoadingState() {
-  return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-      <CircularProgress />
-    </Box>
-  );
-}
-
-function EmptyState() {
-  return <Alert severity="info">No events found. Create your first event!</Alert>;
-}
-
-interface EventsTableProps {
-  events: EventModel[];
-  onEdit: (event: EventModel) => void;
-  onDelete: (id: string) => void;
-}
-
-function EventsTable({ events, onEdit, onDelete }: EventsTableProps) {
-  return (
-    <TableContainer component={Paper}>
-      <Table>
-        <EventTableHead />
-        <EventTableBody events={events} onEdit={onEdit} onDelete={onDelete} />
-      </Table>
-    </TableContainer>
-  );
-}
-
-function EventTableHead() {
-  return (
-    <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
-      <TableRow>
-        {TABLE_HEADERS.map(header => (
-          <TableCell
-            key={header.key}
-            align={header.align}
-          >
-            <strong>{header.label}</strong>
-          </TableCell>
-        ))}
-      </TableRow>
-    </TableHead>
-  );
-}
-
-interface EventTableBodyProps {
-  events: EventModel[];
-  onEdit: (event: EventModel) => void;
-  onDelete: (id: string) => void;
-}
-
-function EventTableBody({ events, onEdit, onDelete }: EventTableBodyProps) {
-  return (
-    <TableBody>
-      {events.map((eventItem) => (
-        <EventTableRow
-          key={eventItem._id}
-          event={eventItem}
-          onEdit={onEdit}
-          onDelete={onDelete}
-        />
-      ))}
-    </TableBody>
-  );
-}
-
-interface EventTableRowProps {
-  event: EventModel;
-  onEdit: (event: EventModel) => void;
-  onDelete: (id: string) => void;
-}
-
-function EventTableRow({ event, onEdit, onDelete }: EventTableRowProps) {
-  return (
-    <TableRow>
-      <TableCell>{event.name}</TableCell>
-      <TableCell>{formatEventDate(event.eventDate)}</TableCell>
-      <TableCell>{event.venue}</TableCell>
-      <TableCell>{event.organizer}</TableCell>
-      <TableCell>{event.availableTicket}</TableCell>
-      <TableCell align="right">
-        <IconButton
-          size="small"
-          onClick={() => onEdit(event)}
-          title="Edit event"
-        >
-          <EditIcon />
-        </IconButton>
-        <IconButton
-          size="small"
-          color="error"
-          onClick={() => onDelete(event._id)}
-          title="Delete event"
-        >
-          <DeleteIcon />
-        </IconButton>
-      </TableCell>
-    </TableRow>
-  );
-}
-
-interface EventFormDialogProps {
-  open: boolean;
-  onClose: () => void;
-  event: EventModel | null;
-  isCreating: boolean;
-  onSave: (formData: Omit<EventModel, '_id'>) => Promise<void>;
-}
-
-function EventFormDialog({ open, onClose, event, isCreating, onSave }: EventFormDialogProps) {
-  return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>
-        {isCreating ? 'Create New Event' : 'Edit Event'}
-      </DialogTitle>
-      <DialogContent>
-        <EventForm
-          event={event}
-          onSave={onSave}
-          onCancel={onClose}
-          isCreating={isCreating}
-        />
-      </DialogContent>
-    </Dialog>
   );
 }

@@ -10,6 +10,7 @@ import ReservationForm from './ReservationForm';
 import { Ticket } from '@/models/Ticket.model';
 import { formatEventDate } from '@/libs/eventValidation';
 import { useAlert } from '@/contexts/AlertContext';
+import ConfirmDeleteDialog from '../ConfirmDeleteDialog';
 
 const RESERVATION_API_BASE = 'http://localhost:5000/api/v1/ticketing';
 const DELETE_CONFIRMATION = 'Are you sure you want to delete this reservation?';
@@ -213,33 +214,12 @@ export default function ReservationManagementPageComponent() {
           />
         </DialogContent>
       </Dialog>
-      <Dialog
+      <ConfirmDeleteDialog
         open={confirmDeleteOpen}
         onClose={() => setConfirmDeleteOpen(false)}
-        maxWidth="xs"
-        fullWidth
-      >
-        <DialogTitle>Confirm Delete</DialogTitle>
-        <DialogContent>
-          <p>Are you sure you want to delete this reservation?</p>
-
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 2 }}>
-            <Button
-              variant="outlined"
-              onClick={() => setConfirmDeleteOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="contained"
-              color="error"
-              onClick={confirmDelete}
-            >
-              Delete
-            </Button>
-          </Box>
-        </DialogContent>
-      </Dialog>
+        onConfirm={confirmDelete}
+        message={DELETE_CONFIRMATION}
+      />
     </Container>
   );
 }
