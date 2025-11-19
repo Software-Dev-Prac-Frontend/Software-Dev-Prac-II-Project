@@ -1,13 +1,14 @@
 import { EventJson } from "@/models/Event.model";
 
-const endpoints = [
-    "http://localhost:5000/api/v1/events/",
-];
-
 export default async function getEvent(eid: string): Promise<EventJson> {
     if (!eid) {
         throw new Error("Event id (eid) is required");
     }
+
+    const eventsBaseUrl = process.env.NEXT_PUBLIC_EVENTS_BASE_URL || 'http://localhost:5000/api/v1/events';
+    const endpoints = [
+        eventsBaseUrl,
+    ];
 
     let lastError: unknown = null;
     for (const baseUrl of endpoints) {

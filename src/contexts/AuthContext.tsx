@@ -32,7 +32,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      const response = await fetch("http://localhost:5000/api/v1/auth/me", {
+      const authMeUrl = process.env.NEXT_PUBLIC_AUTH_ME_URL || 'http://localhost:5000/api/v1/auth/me';
+      const response = await fetch(authMeUrl, {
         headers: {
           "Authorization": `Bearer ${token}`,
         },
@@ -52,7 +53,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      const response = await fetch('http://localhost:5000/api/v1/auth/login', {
+      const loginUrl = process.env.NEXT_PUBLIC_AUTH_LOGIN_URL || 'http://localhost:5000/api/v1/auth/login';
+      const authMeUrl = process.env.NEXT_PUBLIC_AUTH_ME_URL || 'http://localhost:5000/api/v1/auth/me';
+      
+      const response = await fetch(loginUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -66,7 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.setItem("token", data.token);
         
         // Fetch user data to get role
-        const userResponse = await fetch('http://localhost:5000/api/v1/auth/me', {
+        const userResponse = await fetch(authMeUrl, {
           headers: {
             "Authorization": `Bearer ${data.token}`,
           },
@@ -90,7 +94,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = async (name: string, email: string, tel: string, password: string, role: 'member' | 'admin'): Promise<boolean> => {
     try {
-      const response = await fetch('http://localhost:5000/api/v1/auth/register', {
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000/api/v1';
+      const registerUrl = `${apiBaseUrl}/auth/register`;
+      
+      const response = await fetch(registerUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -104,7 +111,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.setItem("token", data.token);
         
         // Fetch user data to get complete user info with role
-        const userResponse = await fetch('http://localhost:5000/api/v1/auth/me', {
+        const authMeUrl = process.env.NEXT_PUBLIC_AUTH_ME_URL || 'http://localhost:5000/api/v1/auth/me';
+        const userResponse = await fetch(authMeUrl, {
           headers: {
             "Authorization": `Bearer ${data.token}`,
           },
@@ -128,7 +136,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     try {
-      await fetch('http://localhost:5000/api/v1/auth/logout', {
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000/api/v1';
+      const logoutUrl = `${apiBaseUrl}/auth/logout`;
+      
+      await fetch(logoutUrl, {
         credentials: 'include',
       });
     } catch (error) {

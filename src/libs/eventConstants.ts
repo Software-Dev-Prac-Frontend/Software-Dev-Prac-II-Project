@@ -1,10 +1,12 @@
 // API endpoints for event management
+const EVENTS_BASE_URL = process.env.NEXT_PUBLIC_EVENTS_BASE_URL || 'http://localhost:5000/api/v1/events';
+
 export const EVENT_API = {
-  BASE_URL: 'http://localhost:5000/api/v1/events',
-  GET_ALL: () => 'http://localhost:5000/api/v1/events',
-  CREATE: () => 'http://localhost:5000/api/v1/events',
-  UPDATE: (id: string) => `http://localhost:5000/api/v1/events/${id}`,
-  DELETE: (id: string) => `http://localhost:5000/api/v1/events/${id}`,
+  BASE_URL: EVENTS_BASE_URL,
+  GET_ALL: () => EVENTS_BASE_URL,
+  CREATE: () => EVENTS_BASE_URL,
+  UPDATE: (id: string) => `${EVENTS_BASE_URL}/${id}`,
+  DELETE: (id: string) => `${EVENTS_BASE_URL}/${id}`,
 };
 
 // Error messages

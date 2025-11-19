@@ -62,11 +62,19 @@ export const filterEventsByTicketAvailability = (events: EventModel[], availabil
 // Reservation search and filter
 export const searchReservations = (reservations: Ticket[], searchTerm: string): Ticket[] => {
   const term = searchTerm.toLowerCase();
-  return reservations.filter(reservation =>
-    (typeof reservation.user === 'string' && reservation.user.toLowerCase().includes(term)) ||
-    reservation.event?.name?.toLowerCase().includes(term) ||
-    reservation.event?.venue?.toLowerCase().includes(term)
-  );
+  return reservations.filter(reservation => {
+    // Search by user (can be string ID or user object with name)
+    const userMatch = 
+      (typeof reservation.user === 'string' && reservation.user.toLowerCase().includes(term)) ||
+      (typeof reservation.user === 'object' && (reservation.user as any)?.name?.toLowerCase().includes(term));
+    
+    // Search by event name and venue
+    const eventMatch = 
+      reservation.event?.name?.toLowerCase().includes(term) ||
+      reservation.event?.venue?.toLowerCase().includes(term);
+    
+    return userMatch || eventMatch;
+  });
 };
 
 export const filterReservationsByDateRange = (reservations: Ticket[], dateFilter: 'all' | 'today' | 'week' | 'month'): Ticket[] => {

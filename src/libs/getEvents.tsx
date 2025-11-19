@@ -1,10 +1,11 @@
 import { EventsJson } from "@/models/Event.model";
 
-const endpoints = [
-    "http://localhost:5000/api/v1/events/",
-];
-
 export default async function getEvents(): Promise<EventsJson> {
+    const eventsBaseUrl = process.env.NEXT_PUBLIC_EVENTS_BASE_URL || 'http://localhost:5000/api/v1/events';
+    const endpoints = [
+        eventsBaseUrl,
+    ];
+    
     let lastError: unknown = null;
     for (const url of endpoints) {
         try {

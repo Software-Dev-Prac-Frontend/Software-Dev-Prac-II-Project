@@ -15,7 +15,7 @@ import { searchReservations, filterReservationsByEventDateRange, filterReservati
 import { useAlert } from '@/contexts/AlertContext';
 import ConfirmDeleteDialog from '../ConfirmDeleteDialog';
 
-const RESERVATION_API_BASE = 'http://localhost:5000/api/v1/ticketing';
+const RESERVATION_API_BASE = process.env.NEXT_PUBLIC_TICKETING_BASE_URL || 'http://localhost:5000/api/v1/ticketing';
 const DELETE_CONFIRMATION = 'Are you sure you want to delete this reservation?';
 
 export default function ReservationManagementPageComponent() {
@@ -175,7 +175,7 @@ export default function ReservationManagementPageComponent() {
           size="small"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Name, email, event, venue..."
+          placeholder="User name, event, venue..."
           sx={{ flex: 1, minWidth: 250 }}
         />
         <Button

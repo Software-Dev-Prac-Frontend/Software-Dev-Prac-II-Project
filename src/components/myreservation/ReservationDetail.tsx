@@ -76,7 +76,8 @@ export default function ReservationDetail() {
 
     const fetchTicketings = async () => {
         try {
-        const res = await axios.get("http://localhost:5000/api/v1/ticketing/", {
+        const ticketingUrl = process.env.NEXT_PUBLIC_TICKETING_BASE_URL || 'http://localhost:5000/api/v1/ticketing';
+        const res = await axios.get(`${ticketingUrl}/`, {
             headers: { Authorization: `Bearer ${token}` },
         });
 
