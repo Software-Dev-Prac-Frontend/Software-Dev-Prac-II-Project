@@ -2,9 +2,9 @@
 
 import ReservationPageComponent from "@/components/reservation/ReservationPageComponent";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 
-export default function ReservationPage(){
+function ReservationPageContent(){
     const searchParams = useSearchParams();
     const eventId = searchParams.get("eventId") || "";
     const [eventIdState, setEventIdState] = useState<string>("");
@@ -15,5 +15,13 @@ export default function ReservationPage(){
 
     return (
         <ReservationPageComponent eventId={eventIdState} onChange={setEventIdState} />
+    );
+}
+
+export default function ReservationPage(){
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <ReservationPageContent />
+        </Suspense>
     );
 }
