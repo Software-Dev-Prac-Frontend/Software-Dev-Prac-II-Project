@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import ReservationForm from './ReservationForm';
 import { Ticket } from '@/models/Ticket.model';
 import { formatEventDate } from '@/libs/eventValidation';
+import { useAlert } from '@/contexts/AlertContext';
 
 const RESERVATION_API_BASE = 'http://localhost:5000/api/v1/ticketing';
 const DELETE_CONFIRMATION = 'Are you sure you want to delete this reservation?';
@@ -16,11 +17,19 @@ const DELETE_CONFIRMATION = 'Are you sure you want to delete this reservation?';
 export default function ReservationManagementPageComponent() {
   const { user } = useAuth();
   const router = useRouter();
+  const { showAlert } = useAlert();
   const [reservations, setReservations] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState<Ticket | null>(null);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  const handleAskDelete = (id: string) => {
+    setDeleteId(id);
+    setConfirmDeleteOpen(true);
+  };
 
   // Redirect if not admin
   useEffect(() => {
@@ -89,17 +98,19 @@ export default function ReservationManagementPageComponent() {
 
       await loadReservations();
       handleCloseDialog();
+      showAlert("Reservation updated successfully!", "success");
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update reservation');
+      showAlert(err instanceof Error ? err.message : 'Failed to update reservation', "error");
     }
   };
 
-  const handleDeleteReservation = async (id: string) => {
-    if (!window.confirm(DELETE_CONFIRMATION)) return;
+  const confirmDelete = async () => {
+    if (!deleteId) return;
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${RESERVATION_API_BASE}/${id}`, {
+      const response = await fetch(`${RESERVATION_API_BASE}/${deleteId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -108,11 +119,16 @@ export default function ReservationManagementPageComponent() {
 
       if (!response.ok) throw new Error('Failed to delete reservation');
 
+      showAlert("Reservation deleted successfully!", "success");
       await loadReservations();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete reservation');
+      showAlert(err instanceof Error ? err.message : 'Failed to delete reservation', "error");
+    } finally {
+      setConfirmDeleteOpen(false);
+      setDeleteId(null);
     }
   };
+
 
   if (user?.role !== 'admin') {
     return null;
@@ -174,7 +190,7 @@ export default function ReservationManagementPageComponent() {
                     <IconButton
                       size="small"
                       color="error"
-                      onClick={() => handleDeleteReservation(reservation._id)}
+                      onClick={() => handleAskDelete(reservation._id)}
                       title="Delete reservation"
                     >
                       <DeleteIcon />
@@ -195,6 +211,33 @@ export default function ReservationManagementPageComponent() {
             onSave={handleSaveReservation}
             onCancel={handleCloseDialog}
           />
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        open={confirmDeleteOpen}
+        onClose={() => setConfirmDeleteOpen(false)}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <p>Are you sure you want to delete this reservation?</p>
+
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 2 }}>
+            <Button
+              variant="outlined"
+              onClick={() => setConfirmDeleteOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={confirmDelete}
+            >
+              Delete
+            </Button>
+          </Box>
         </DialogContent>
       </Dialog>
     </Container>

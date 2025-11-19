@@ -3,6 +3,7 @@
 import { Drawer, Box, List, ListItem, ListItemText } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useAuth } from '@/contexts/AuthContext';
+import { useAlert } from "@/contexts/AlertContext";
 
 interface DrawerMenuProps {
   open: boolean;
@@ -12,10 +13,13 @@ interface DrawerMenuProps {
 export default function DrawerMenu({ open, toggleDrawer }: DrawerMenuProps) {
     const router = useRouter();
     const { user, logout } = useAuth();
+    const { showAlert } = useAlert();
 
     const handleSignOut = () => {
         logout();
         toggleDrawer();
+        showAlert("Signed out successfully", "success");
+        router.push("/");
     };
 
     // Define menu items based on user role

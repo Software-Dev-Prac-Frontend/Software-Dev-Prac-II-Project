@@ -17,6 +17,7 @@ import {
   Container
 } from '@mui/material';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAlert } from '@/contexts/AlertContext';
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -32,6 +33,7 @@ export default function LoginPage() {
   const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
   const { login, register } = useAuth();
   const router = useRouter();
+  const { showAlert } = useAlert();
 
   const validateField = (name: string, value: string) => {
     const errors: {[key: string]: string} = {};
@@ -113,11 +115,14 @@ export default function LoginPage() {
       }
 
       if (success) {
+        showAlert(isLogin ? "Logged in successfully" : "Registered successfully", "success");
         router.push('/');
       } else {
+        showAlert(isLogin ? "Invalid email or password" : "Registration failed", "error");
         setError(isLogin ? 'Invalid email or password' : 'Registration failed');
       }
     } catch (err) {
+      showAlert('An error occurred. Please try again.', "error");
       setError('An error occurred. Please try again.');
     } finally {
       setLoading(false);

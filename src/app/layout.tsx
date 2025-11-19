@@ -4,6 +4,7 @@ import "./globals.css";
 import TopMenu from "@/components/TopMenu";
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { AlertProvider } from "@/contexts/AlertContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,8 +33,10 @@ export default function RootLayout({
       >
         <AppRouterCacheProvider>
           <AuthProvider>
-            <TopMenu />
-            {children}
+            <AlertProvider>
+              <TopMenu />
+              {children}
+            </AlertProvider>
           </AuthProvider>
         </AppRouterCacheProvider>
       </body>

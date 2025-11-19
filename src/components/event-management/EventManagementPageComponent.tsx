@@ -12,8 +12,8 @@ import { EventModel } from '@/models/Event.model';
 import { fetchAllEvents, createEvent, updateEvent, deleteEvent } from '@/libs/eventApi';
 import { formatEventDate } from '@/libs/eventValidation';
 import { TABLE_HEADERS } from '@/libs/eventConstants';
-
-const DELETE_CONFIRMATION_MESSAGE = 'Are you sure you want to delete this event?';
+import { useAlert } from '@/contexts/AlertContext';
+import ConfirmDeleteDialog from '../ConfirmDeleteDialog';
 
 export default function EventManagementPageComponent() {
   const { user } = useAuth();
@@ -24,6 +24,15 @@ export default function EventManagementPageComponent() {
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<EventModel | null>(null);
   const [isCreating, setIsCreating] = useState(false);
+  const { showAlert } = useAlert();
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+
+
+  const askDeleteEvent = (id: string) => {
+    setDeleteId(id);
+    setConfirmDeleteOpen(true);
+  }; 
 
   // Redirect if not admin
   useEffect(() => {
@@ -79,22 +88,30 @@ export default function EventManagementPageComponent() {
 
       await loadEvents();
       handleCloseDialog();
+      showAlert(`Event ${isCreating ? 'created' : 'updated'} successfully!`, "success");
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save event');
+      showAlert(err instanceof Error ? err.message : 'Failed to save event', "error");
     }
   };
 
-  const handleDeleteEvent = async (id: string) => {
-    if (!window.confirm(DELETE_CONFIRMATION_MESSAGE)) return;
+  const confirmDeleteEvent = async () => {
+    if (!deleteId) return;
 
     try {
       const token = localStorage.getItem('token');
-      await deleteEvent(id, token);
+      await deleteEvent(deleteId, token);
+
       await loadEvents();
+      showAlert("Event deleted successfully!", "error");
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete event');
+      showAlert(err instanceof Error ? err.message : 'Failed to delete event', "error");
+    } finally {
+      setConfirmDeleteOpen(false);
+      setDeleteId(null);
     }
   };
+
 
   if (user?.role !== 'admin') {
     return null;
@@ -115,7 +132,7 @@ export default function EventManagementPageComponent() {
       ) : events.length === 0 ? (
         <EmptyState />
       ) : (
-        <EventsTable events={events} onEdit={handleOpenDialog} onDelete={handleDeleteEvent} />
+        <EventsTable events={events} onEdit={handleOpenDialog} onDelete={askDeleteEvent} />
       )}
 
       <EventFormDialog
@@ -124,6 +141,12 @@ export default function EventManagementPageComponent() {
         event={selectedEvent}
         isCreating={isCreating}
         onSave={handleSaveEvent}
+      />
+      <ConfirmDeleteDialog
+        open={confirmDeleteOpen}
+        onClose={() => setConfirmDeleteOpen(false)}
+        onConfirm={confirmDeleteEvent}
+        message="Are you sure you want to delete this event?"
       />
     </Container>
   );

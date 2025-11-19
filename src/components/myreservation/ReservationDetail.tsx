@@ -7,6 +7,7 @@ import { updateTicketing } from "@/libs/updateTicketing";
 import { deleteTicketing } from "@/libs/deleteTicketing";
 import EditTicketDialog from "@/components/myreservation/EditTicketDialog";
 import DeleteTicketDialog from "./DeleteTicketDialog";
+import { useAlert } from "@/contexts/AlertContext";
 
 type EventType = {
     _id: string;
@@ -33,6 +34,7 @@ export default function ReservationDetail() {
     const [editAmount, setEditAmount] = useState(1);
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [deleteTicketId, setDeleteTicketId] = useState("");
+    const { showAlert } = useAlert();
 
     const openDeletePopup = (id: string) => {
         setDeleteTicketId(id);
@@ -43,9 +45,10 @@ export default function ReservationDetail() {
         try {
             await deleteTicketing(deleteTicketId, token);
             setDeleteOpen(false);
-            fetchTicketings(); // refresh list
+            fetchTicketings();
+            showAlert("Reservation deleted successfully!", "error");
         } catch (err: any) {
-            alert(err.response?.data?.message || "Delete failed");
+            showAlert(err.response?.data?.message || "Delete failed", "error");
         }
     };
 
@@ -59,9 +62,10 @@ export default function ReservationDetail() {
         try {
             await updateTicketing(editTicketId, newAmount, token);
             setEditOpen(false);
-            fetchTicketings(); // reload
+            fetchTicketings();
+            showAlert("Reservation updated successfully!", "success");
         } catch (err: any) {
-            alert(err.response?.data?.message || "Update failed");
+            showAlert(err.response?.data?.message || "Update failed", "error");
         }
     };
 

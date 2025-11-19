@@ -6,7 +6,7 @@ import { EventModel } from "@/models/Event.model";
 import getEvents from "@/libs/getEvents";
 import { createTicketing } from "@/libs/createTicketing";
 import { useRouter } from "next/navigation";
-import CheckIcon from '@mui/icons-material/Check';
+import { useAlert } from "@/contexts/AlertContext";
 
 interface ReservationBoxProps {
     eventId: string;
@@ -18,6 +18,7 @@ export default function ReservationBox({ eventId, onChange }: ReservationBoxProp
     const [ticket, setTicket] = useState<number>(1);
     const [token, setToken] = useState<string>("");
     const router = useRouter();
+    const { showAlert } = useAlert();
     
     useEffect(() => {
         const t = localStorage.getItem("token");
@@ -26,15 +27,16 @@ export default function ReservationBox({ eventId, onChange }: ReservationBoxProp
 
     async function handleCreateEvent() {
         if(!token){
-            window.alert("Please login to reserve ticket.");
+            showAlert("Please login to reserve ticket.", "error");
         }
         else{
             try{
                 console.log("Creating ticketing for eventId:", eventId, "with", ticket, "tickets.");
             await createTicketing(eventId, ticket, token);
             router.push("/myreservation");
+            showAlert("Reservation successful!", "success");
             } catch (err: any) {
-                window.alert(err.message || "Reservation failed");
+                showAlert(err.message || "Reservation failed", "error");
             }
         }
     }
@@ -62,6 +64,8 @@ export default function ReservationBox({ eventId, onChange }: ReservationBoxProp
         <Box sx={{
             display: "flex",
             flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
             width: { xs: "100%", md: 320 },
             height: "fit-content",
             bgcolor: "white",

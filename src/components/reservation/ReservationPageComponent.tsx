@@ -66,14 +66,12 @@ export default function ReservationPageComponent({ eventId, onChange }: Reservat
                 flexDirection: { xs: "column", md: "row" },
                 gap: { xs: 2, md: 4 },
                 alignItems: { xs: "stretch", md: "stretch" },
-                width: "100%"
+                justifyContent: "center",
+                width: "100%",
+                alignContent: "center"
             }}>
                 <DetailEvent eventId={eventId} />
-                <Box
-                    sx={{
-                        display: { xs: "none", md: "block" }
-                    }}
-                >
+                <Box sx={{ display: { xs: "none", md: "block" } }}>
                     <Divider
                         orientation="vertical"
                         sx={{
@@ -82,11 +80,7 @@ export default function ReservationPageComponent({ eventId, onChange }: Reservat
                         }}
                     />
                 </Box>
-                <Box
-                    sx={{
-                        display: { xs: "block", md: "none" }
-                    }}
-                >
+                <Box sx={{ display: { xs: "block", md: "none" } }}>
                     <Divider
                         sx={{
                             borderColor: "#000",
@@ -94,7 +88,9 @@ export default function ReservationPageComponent({ eventId, onChange }: Reservat
                         }}
                     />
                 </Box>
-                <ReservationBox eventId={eventId} onChange={onChange} />
+                <Box sx={{alignItems:"center",justifyContent:"center",display:"flex"}}>
+                    <ReservationBox eventId={eventId} onChange={onChange} />
+                </Box>
             </Box>
         </Box>
     );
